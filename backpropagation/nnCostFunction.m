@@ -46,20 +46,22 @@ Theta2_grad = zeros(size(Theta2));
 %Theta_1 is hidden layer size * input_layer_size+1
 %Theta_2 is num_labels * hidden_layer_size+1
 % X is number_of_examples*(input_layer_size+1)
+%z_2 is number_of_examples * hidden_layer_size
+%a_2 is number_of_examples * hidden_layer_size
+%z_3 is num of examples * num_of_labels
+%a_3 is num of examples * num_of_labels
 
+%we should add the bias too here 
 X = [ ones(m,1) X ];
 
-%a_2 is number_of_examples * hidden_layer_size
-%z_2 is number_of_examples * hidden_layer_size+1
-%we should add the bias too here 
 a_1 = X;
 
 z_2 = X*(Theta1)';
-a_2 = sigmoid(z_2);
+a_2 =[ ones(m,1) sigmoid(z_2) ];
 
-z_3 = [ ones(m,1) a_2 ]*(Theta2');
+%we should add the bias too here 
+z_3 = a_2*(Theta2');
 a_3 = sigmoid(z_3);
-
 
 yy = zeros(size(y),num_labels);
 for i=1:m
@@ -70,11 +72,43 @@ end
 % when you calculate error difference, you dont take the max and difference
 
 % the method below is vectorized but quiet inefficient
-J=-(log(a_3)*yy'+log(1-a_3)*(1-yy'));
-J=sum(diag(J))/m;
+%J=-(log(a_3)*yy'+log(1-a_3)*(1-yy'));
+%J=sum(diag(J))/m;
 
+% below is a better vectorized way of determining cost function 
+J=-(sum(sum(log(a_3).*yy,2))+sum(sum(log(1-a_3).*(1-yy')',2)))/(m);
+
+% regularization
 J+= (lambda/(2*m))* ( sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)) );
- 
+
+
+% delta_3 is number_of_examples * number_of_labels
+% Theta2 is number_of_labels* hidden_layer_size+1
+% sigmoidGradient(z_2) is number_of_examples * hidden_layer_size+1
+% delta_2 is number_of_examples * hidden_layer_size
+delta_3 = a_3 - yy;
+
+% remove the delta to bias 
+delta_2 = (delta_3*Theta2).*([ ones(m,1) sigmoidGradient(z_2) ]); 
+delta_2 = delta_2(:,2:end);
+
+size(delta_2);
+size(a_1);
+
+size(delta_3);
+size(a_2);
+
+%a_2 is number_of_examples * hidden_layer_size
+
+
+Theta1_grad = (delta_2'*a_1)/(m)+((lambda)/(m))*[ zeros(size(Theta1,1),1) Theta1(:,2:end)] ;
+Theta2_grad = (delta_3'*a_2)/(m)+((lambda)/(m))*[ zeros(size(Theta2,1),1) Theta2(:,2:end)] ;
+
+%Delta_3 is 1 * number_labels
+%Delta_2 is 1 * hidden_layer_size 
+
+grad = [ Theta1_grad(:) ; Theta2_grad(:) ];
+
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
 %         the cost function with respect to Theta1 and Theta2 in Theta1_grad and
@@ -98,6 +132,7 @@ J+= (lambda/(2*m))* ( sum(sum(Theta1(:,2:end).^2)) + sum(sum(Theta2(:,2:end).^2)
 %               and Theta2_grad from Part 2.
 %
 
+% have to unroll Theta1_grad and Theta2_grad to get grad 
 
 
 
