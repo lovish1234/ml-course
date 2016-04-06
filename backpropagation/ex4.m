@@ -36,6 +36,7 @@ load('ex4data1.mat');
 m = size(X, 1);
 
 % Randomly select 100 data points to display
+% randomly generate numbers from 1 to m and take 1 to 100 from them
 sel = randperm(size(X, 1));
 sel = sel(1:100);
 
@@ -52,6 +53,7 @@ pause;
 fprintf('\nLoading Saved Neural Network Parameters ...\n')
 
 % Load the weights into variables Theta1 and Theta2
+% are these weights assignmed randomly ???
 load('ex4weights.mat');
 
 % Unroll parameters 
