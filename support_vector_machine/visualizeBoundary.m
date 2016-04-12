@@ -20,7 +20,7 @@ end
 
 
 hold on
-contour(X1, X2, vals,[10 10],'LineColor','r');
+contour(X1, X2, vals,[1 0],'LineColor','r');
 hold off;
 
 end

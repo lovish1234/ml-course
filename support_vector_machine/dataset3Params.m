@@ -11,6 +11,10 @@ function [C, sigma] = dataset3Params(X, y, Xval, yval)
 C = 1;
 sigma = 0.3;
 
+% got 1 and 0.1 from the values below, tweaked it to get final result
+C=0.9;
+sigma=0.1;
+
 % ====================== YOUR CODE HERE ======================
 % Instructions: Fill in this function to return the optimal C and sigma
 %               learning parameters found using the cross validation set.
@@ -28,19 +32,19 @@ sigmaexp = [ 0.01 0.03 0.1 0.3 1 3 10 30 ];
 minErr = 100;
 
 
-for i=1:8
-    for j=1:8
-      model= svmTrain(X, y, Cexp(i), @(x1, x2) gaussianKernel(x1, x2, sigmaexp(j)));
+for i=0.9:0.01:1.1
+    for j=0.09:0.01:0.1
+      model= svmTrain(X, y, i, @(x1, x2) gaussianKernel(x1, x2, j));
       predictions = svmPredict(model, Xval);
       err = mean(double(predictions ~= yval));
       if err < minErr
           minErr = err
-          C = Cexp(i);
-          sigma = sigmaexp(i);
+          C = i;
+          sigma = j;
       end
     end
 end
-   
+
 
 
 % =========================================================================
